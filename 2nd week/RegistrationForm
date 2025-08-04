@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Registration Form</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBpUfs6PnxZm7WFayf7ytEeCgYevcfVBoVNQ&s');
+    background-size: cover;
+  }
+  form {
+    background: white;
+    padding: 30px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    width: 320px;
+  }
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    font-size: 14px;
+  }
+  input {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 15px;
+    border: 1.8px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  input:focus {
+    border-color: #4a90e2;
+    outline: none;
+  }
+  .rules {
+    font-size: 13px;
+    margin: -12px 0 12px 5px;
+    color: #c0392b;
+  }
+  .rules.valid {
+    color: #27ae60;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    background: #4a90e2;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  button:hover {
+    background: #357ABD;
+  }
+  .error-msg {
+    color: #c0392b;
+    font-size: 13px;
+    margin: -10px 0 12px 5px;
+  }
+</style>
+</head>
+<body>
+
+<form id="regForm" onsubmit="return validateForm()">
+  <h2>Register</h2>
+
+  <label for="name">Name</label>
+  <input type="text" id="name" name="name" required />
+
+  <label for="email">Email</label>
+  <input type="email" id="email" name="email" required />
+  <div id="emailError" class="error-msg"></div>
+
+  <label for="password">Password</label>
+  <input type="password" id="password" name="password" required autocomplete="new-password" />
+  <div>
+    <small id="ruleLength" class="rules">At least 6 characters</small><br/>
+    <small id="ruleUpper" class="rules">At least one uppercase letter</small><br/>
+    <small id="ruleSymbol" class="rules">At least one symbol (!@#$ etc.)</small>
+  </div>
+
+  <label for="confirmPassword">Confirm Password</label>
+  <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password" />
+  <div id="confirmError" class="error-msg"></div>
+
+  <button type="submit">Register</button>
+</form>
+
+<script>
+  const emailInput = document.getElementById('email');
+  const emailError = document.getElementById('emailError');
+
+  const passwordInput = document.getElementById('password');
+  const confirmPasswordInput = document.getElementById('confirmPassword');
+  const confirmError = document.getElementById('confirmError');
+
+  const ruleLength = document.getElementById('ruleLength');
+  const ruleUpper = document.getElementById('ruleUpper');
+  const ruleSymbol = document.getElementById('ruleSymbol');
+
+  passwordInput.addEventListener('input', () => {
+    const pwd = passwordInput.value;
+    ruleLength.classList.toggle('valid', pwd.length >= 6);
+    ruleUpper.classList.toggle('valid', /[A-Z]/.test(pwd));
+    ruleSymbol.classList.toggle('valid', /[^a-zA-Z0-9]/.test(pwd));
+  });
+
+  function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function validateForm() {
+    emailError.textContent = '';
+    confirmError.textContent = '';
+    let valid = true;
+
+    if (!validateEmail(emailInput.value.trim())) {
+      emailError.textContent = 'Invalid email address';
+      valid = false;
+    }
+
+    const pwd = passwordInput.value;
+    if (
+      pwd.length < 6 ||
+      !/[A-Z]/.test(pwd) ||
+      !/[^a-zA-Z0-9]/.test(pwd)
+    ) {
+      alert('Password must be at least 6 characters, contain an uppercase letter, and a symbol.');
+      valid = false;
+    }
+
+    if (pwd !== confirmPasswordInput.value) {
+      confirmError.textContent = "Passwords don't match";
+      valid = false;
+    }
+
+    if (valid) {
+      alert('Registration successful!');
+    }
+    return valid;
+  }
+</script>
+
+</body>
+</html>
