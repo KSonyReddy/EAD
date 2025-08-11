@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Visible Chessboard with Drag & Drop</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="chessboard" id="board"></div>
+
+  <script>
+    const board = document.getElementById('board');
+
+    const piecesOrder = ['&#9820;', '&#9822;', '&#9821;', '&#9819;', '&#9818;', '&#9821;', '&#9822;', '&#9820;'];
+    const pawn = '&#9823;';
+
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        const square = document.createElement('div');
+        const isWhiteSquare = (row + col) % 2 === 0;
+        square.className = 'square ' + (isWhiteSquare ? 'white' : 'black');
+        square.dataset.row = row;
+        square.dataset.col = col;
+
+        let piece = '';
+        let isWhitePiece = false;
+
+        if (row === 0) {
+          piece = piecesOrder[col];
+          isWhitePiece = false;
+        } else if (row === 1) {
+          piece = pawn;
+          isWhitePiece = false;
+        } else if (row === 6) {
+          piece = pawn;
+          isWhitePiece = true;
+        } else if (row === 7) {
+          piece = piecesOrder[col];
+          isWhitePiece = true;
+        }
+
+        if (piece) {
+          const pieceElem = document.createElement('span');
+          pieceElem.innerHTML = piece;
+          pieceElem.className = isWhitePiece ? 'white-piece' : 'black-piece';
+          pieceElem.classList.add('piece');
+          pieceElem.draggable = true;
+
+          // Add outline if piece color == square color for visibility
+          if ((isWhitePiece && isWhiteSquare) || (!isWhitePiece && !isWhiteSquare)) {
+            pieceElem.classList.add('outline-piece');
+          }
+
+          // Drag start
+          pieceElem.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', '');
+            e.dataTransfer.setData('sourceRow', row);
+            e.dataTransfer.setData('sourceCol', col);
+          });
+
+          square.appendChild(pieceElem);
+        }
+
+        // Allow drop on square
+        square.addEventListener('dragover', (e) => {
+          e.preventDefault();
+        });
+
+        square.addEventListener('drop', (e) => {
+          e.preventDefault();
+          const sourceRow = e.dataTransfer.getData('sourceRow');
+          const sourceCol = e.dataTransfer.getData('sourceCol');
+
+          const sourceSquare = board.querySelector(`.square[data-row='${sourceRow}'][data-col='${sourceCol}']`);
+          const draggedPiece = sourceSquare.querySelector('.piece');
+
+          if (draggedPiece) {
+            // Remove from old square
+            sourceSquare.removeChild(draggedPiece);
+
+            // Remove piece on drop target (capture)
+            const targetPiece = square.querySelector('.piece');
+            if (targetPiece) square.removeChild(targetPiece);
+
+            // Append piece to new square
+            square.appendChild(draggedPiece);
+
+            // Update classes for outline based on new square color & piece color
+            const pieceIsWhite = draggedPiece.classList.contains('white-piece');
+            const squareIsWhite = square.classList.contains('white');
+
+            if ((pieceIsWhite && squareIsWhite) || (!pieceIsWhite && !squareIsWhite)) {
+              draggedPiece.classList.add('outline-piece');
+            } else {
+              draggedPiece.classList.remove('outline-piece');
+            }
+          }
+        });
+
+        board.appendChild(square);
+      }
+    }
+  </script>
+</body>
+</html>
